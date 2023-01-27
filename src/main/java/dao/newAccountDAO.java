@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import dto.newAccountDTO;
@@ -59,5 +60,62 @@ public class newAccountDAO {
 		}
 		return result;
 	} 
+	
+	
+	public static String getSalt(String mail) {
+		String sql = "SELECT salt FROM team WHERE mail = ?";
+		
+		try (
+				Connection con = getConnection();
+				PreparedStatement pstmt = con.prepareStatement(sql);
+				){
+			pstmt.setString(1, mail);
+
+			try (ResultSet rs = pstmt.executeQuery()){
+				
+				if(rs.next()) {
+					String salt = rs.getString("salt");
+					return salt;
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	// ログイン処理
+	public static newAccountDTO login(String mail, String hashedPw) {
+		String sql = "SELECT * FROM team WHERE mail = ? AND password = ?";
+		
+		try (
+				Connection con = getConnection();
+				PreparedStatement pstmt = con.prepareStatement(sql);
+				){
+			pstmt.setString(1, mail);
+			pstmt.setString(2, hashedPw);
+
+			try (ResultSet rs = pstmt.executeQuery()){
+				
+				if(rs.next()) {
+					int id = rs.getInt("id");
+					String salt = rs.getString("salt");
+					String name = rs.getString("name");
+					String furigana = rs.getString("furigana");
+					String createdAt = rs.getString("created_at");
+					
+					return new newAccountDTO(id,mail,salt, null, null, name, furigana);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	
 }

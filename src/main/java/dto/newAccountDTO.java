@@ -66,6 +66,13 @@ public class newAccountDTO {
 	public void setFurigana(String furigana) {
 		this.furigana = furigana;
 	}
+
+
+
+	public static newAccountDTO login(String mail2, String hashedPw) {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
+	}
 	
 	 
 	 
